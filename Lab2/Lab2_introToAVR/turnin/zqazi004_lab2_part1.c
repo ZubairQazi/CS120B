@@ -20,10 +20,11 @@ int main(void) {
     unsigned char tmpA = 0x00; // Temporary variable to hold the value of A
     while(1) {
         // 1) Read input
-        tmpA = PINA;
+        tmpA0 = PINA & 0x01;
+        tmpA1 = PINB & 0x02;
         // 2) Perform computation
 
-        if (tmpA == 0x01) { // True if PA0 is 1 and PA1 is 0
+        if (tmpA0 == 0x01 && tmpA1 == 0x00) { // True if PA0 is 1 and PA1 is 0
             tmpB = (tmpB & 0xFE) | 0x01; // Sets tmpB to bbbbbbb1
                              // (clear rightmost 1 bits, then set to 1)
         } else {
