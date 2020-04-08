@@ -49,40 +49,15 @@ echo Running all tests..."\n\n
 # expectPORTB 0x01
 # checkResult
 
-# PART 2 TESTS
-
-test "PINA: 0x01 => PORTC: 0x03"
-setPINA 0x01
-continue 2
-expect PORTC 0x03
-checkResult
-
-test "PINA: 0x04 => PORTC: 0x03"
-setPINA 0x04
-continue 2
-expect PORTC 0x03
-checkResult
-
-test "PINA: 0x05 => PORTC: 0x02"
-setPINA 0x05
-continue 2
-expect PORTC 0x02
-checkResult
-
-test "PINA: 0x00 => PORTC: 0x04"
-setPINA 0x00
-continue 2
-expect PORTC 0x04
-checkResult
-
 # PART 3 TESTS
 
-test "PINA: 0x0F => PORTC: 0x80"
-setPINA 0x0F
+test "PINA: 0xFF, PINB: 0x00, PINC: 0xFF => PORTD: 0x01"
+setPINA 0xFF
+setPINB 0x00
+setPINC 0xFF
 continue 2
-expect PORTC 0x80
+expectPORTD 0x01
 checkResult
-
 
 # Report on how many tests passed/tests ran
 set $passed=$tests-$failed

@@ -1,8 +1,8 @@
 /*	Author: Zubair Qazi
  *  Partner(s) Name: 
  *	Lab Section: 024
- *	Assignment: Lab #2  Exercise #3
- *	Exercise Description: Parking Space Sensor
+ *	Assignment: Lab #2  Exercise #4
+ *	Exercise Description: Ride Weight Sensor
  *
  *	I acknowledge all content contained herein, excluding template or example
  *	code, is my own original work.
@@ -15,68 +15,45 @@
 int main(void) {
 
     DDRA = 0x00; PORTA = 0xFF; // Configure port A's 8 pins as inputs
-    DDRC = 0xFF; PORTC = 0x00; // Configure port C's 8 pins as outputs, initialize to 0s
+    DDRB = 0x00; PORTB = 0xFF;
+    DDRC = 0x00; PORTC = 0xFF;
+    DDRD = 0xFF; PORTD = 0x00; // Configure port C's 8 pins as outputs, initialize to 0s
     
-    unsigned char A0 = 0x00; // Temporary variable to hold the value of A
-    unsigned char A1 = 0x00;
-    unsigned char A2 = 0x00;
-    unsigned char A3 = 0x00;
+    unsigned short total_weight = 0x00; //Total weight of A, B, and C
+    unsigned char tmpA = 0x00;
+    unsigned char tmpB = 0x00;
+    unsigned char tmpC = 0x00;
 
-    unsigned char cntavail = 0x00; // Number of Available Spaces
+    unsigned char ret = 0x00;
 
     while(1) {
         // 1) Read input
-        
-        A0 = PINA & 0x01;
-        A1 = PINA & 0x02;
-        A2 = PINA & 0x04;
-        A3 = PINA & 0x08;
+        tmpA = PINA;
+        tmpB = PINB;
+        tmpC = PINC;
 
         // 2) Perform computation
         
-        // 0000
-        if (A0 == 0x00 && A1 == 0x00 && A2 == 0x00 && A3 == 0x00) {
-            cntavail = 0x04;
+        total_weight = tmpA + tmpB + tmpC;
+
+        if (total_weight > 0x8C) {
+            ret = ret |  0x01;
+        }
+        
+        if (tmpA > tmpC) {
+            if (tmpA - tmpC > 0x50)
+                ret = ret | 0x02;
+        }
+        else {
+            if (tmpC - tmpA > 0x50)
+                ret = ret | 0x02;
         }
 
-        // 1111
-        else if (A0 == 0x01 && A1 == 0x02 && A2 == 0x04 && A3 == 0x08) {
-            // Set PC7 to 1
-            cntavail = 0x80;
-        }
-
-        // 1000 or 0100 or 0010 or 0001
-        else if ( (A0 == 0x01 && A1 == 0x00 && A2 == 0x00 && A3 == 0x00) ||
-                (A0 == 0x00 && A1 == 0x02 && A2 == 0x00 && A3 == 0x00) ||
-                (A0 == 0x00 && A1 == 0x00 && A2 == 0x04 && A3 == 0x00) ||
-                (A0 == 0x00 && A1 == 0x00 && A2 == 0x00 && A3 == 0x08) ) 
-        {
-            cntavail = 0x03;
-        }
-
-        // 1001 or 1010 or 1100 or 0101 or 0011 or 0110
-        else if ( (A0 == 0x01 && A1 == 0x00 && A2 == 0x00 && A3 == 0x08) ||
-                (A0 == 0x01 && A1 == 0x00 && A2 == 0x04 && A3 == 0x00) ||
-                (A0 == 0x01 && A1 == 0x02 && A2 == 0x00 && A3 == 0x00) ||
-                (A0 == 0x00 && A1 == 0x02 && A2 == 0x00 && A3 == 0x08) ||
-                (A0 == 0x00 && A1 == 0x00 && A2 == 0x04 && A3 == 0x08) ||
-                (A0 == 0x00 && A1 == 0x02 && A2 == 0x04 && A3 == 0x00) )
-        {
-            cntavail = 0x02;
-        }
-
-        // 1110 or 1101 or 1011 or 0111 
-        else if ( (A0 == 0x01 && A1 == 0x02 && A2 == 0x04 && A3 == 0x00) ||
-                (A0 == 0x01 && A1 == 0x02 && A2 == 0x00 && A3 == 0x08) ||
-                (A0 == 0x01 && A1 == 0x00 && A2 == 0x04 && A3 == 0x08) ||
-                (A0 == 0x00 && A1 == 0x02 && A2 == 0x04 && A3 == 0x08) ) 
-        {
-            cntavail = 0x01;
-        }
+        ret = (total_weight & 0xFC) | ret;
         
         // 3) Write output
         
-        PORTC = cntavail;
+        PORTD = ret;
     }
     return 0;
 
