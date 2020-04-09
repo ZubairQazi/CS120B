@@ -1,0 +1,4 @@
+build/objects/*.o
+build/objects/*.elf
+build/results/*.vcd
+test/*.bak
