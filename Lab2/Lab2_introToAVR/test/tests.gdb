@@ -49,14 +49,30 @@ echo Running all tests..."\n\n
 # expectPORTB 0x01
 # checkResult
 
-# PART 3 TESTS
+# PART 1 TESTS
 
-test "PINA: 0xFF, PINB: 0x00, PINC: 0xFF => PORTD: 0x01"
-setPINA 0xFF
-setPINB 0x00
-setPINC 0xFF
-continue 2
-expectPORTD 0x01
+test "PINA: 0x01 => PORTB: 0x01"
+setPINA 0x01
+continue 5
+expect PORTB 0x01
+checkResult
+
+test "PINA: 0x00 => PORTB: 0x00"
+setPINA 0x00
+continue 5
+expect PORTB 0x00
+checkResult
+
+test "PINA: 0x02 => PORTB: 0x00"
+setPINA 0x02
+continue 5
+expect PORTB 0x00
+checkResult
+
+test "PINA: 0x03 => PORTB: 0x00"
+setPINA 0x03
+continue 5
+expect PORTB 0x00
 checkResult
 
 # Report on how many tests passed/tests ran

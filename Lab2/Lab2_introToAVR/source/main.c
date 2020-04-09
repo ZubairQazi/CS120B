@@ -15,46 +15,25 @@
 int main(void) {
 
     DDRA = 0x00; PORTA = 0xFF; // Configure port A's 8 pins as inputs
-    DDRB = 0x00; PORTB = 0xFF;
-    DDRC = 0x00; PORTC = 0xFF;
-    DDRD = 0xFF; PORTD = 0x00; // Configure port C's 8 pins as outputs, initialize to 0s
-    
-    unsigned short total_weight = 0x00; //Total weight of A, B, and C
-    unsigned char tmpA = 0x00;
+    DDRB = 0xFF; PORTB = 0x00; // Configure port B's 8 pins as outputs, initialize to 0s
+    unsigned char tmpA0 = 0x00; // Temporary variable to hold the value of B
+    unsigned char tmpA1 = 0x00; // Temporary variable to hold the value of A
     unsigned char tmpB = 0x00;
-    unsigned char tmpC = 0x00;
-
-    unsigned char ret = 0x00;
-
     while(1) {
         // 1) Read input
-        tmpA = PINA;
-        tmpB = PINB;
-        tmpC = PINC;
-
+        tmpA0 = PINA & 0x01;
+        tmpA1 = PINA & 0x02;
         // 2) Perform computation
-        
-        total_weight = tmpA + tmpB + tmpC;
 
-        if (total_weight > 0x8C) {
-            ret = ret |  0x01;
-        }
-        
-        if (tmpA > tmpC) {
-            if (tmpA - tmpC > 0x50)
-                ret = ret | 0x02;
-        }
-        else {
-            if (tmpC - tmpA > 0x50)
-                ret = ret | 0x02;
-        }
-
-        ret = (total_weight & 0xFC) | ret;
-        
+        if (tmpA0 == 0x01 && tmpA1 == 0x00) { // True if PA0 is 1 and PA1 is 0
+            tmpB = (tmpB & 0xFE) | 0x01; // Sets tmpB to bbbbbbb1
+                             // (clear rightmost 1 bits, then set to 1)
+        } else {
+            tmpB = (tmpB & 0xFE) | 0x00; // Sets tmpB to bbbbbbb0
+                             // (clear rightmost 1 bits, then set to 0)
+        }    
         // 3) Write output
-        
-        PORTD = ret;
+        PORTB = tmpB;    
     }
     return 0;
-
 }
