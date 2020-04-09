@@ -15,25 +15,55 @@
 int main(void) {
 
     DDRA = 0x00; PORTA = 0xFF; // Configure port A's 8 pins as inputs
-    DDRB = 0xFF; PORTB = 0x00; // Configure port B's 8 pins as outputs, initialize to 0s
-    unsigned char tmpA0 = 0x00; // Temporary variable to hold the value of B
-    unsigned char tmpA1 = 0x00; // Temporary variable to hold the value of A
+    DDRB = 0x00; PORTB = 0xFF;
+    DDRC = 0x00; PORTC = 0xFF;
+    DDRD = 0xFF; PORTD = 0x00; // Configure port C's 8 pins as outputs, initialize to 0s
+    
+    unsigned short total_weight = 0x00; //Total weight of A, B, and C
+    unsigned char tmpA = 0x00;
     unsigned char tmpB = 0x00;
+    unsigned char tmpC = 0x00;
+    
+    unsigned char over_cap = 0x01;
+    unsigned char balanced = 0x01;
+
+    unsigned char ret = 0x00;
+
     while(1) {
         // 1) Read input
-        tmpA0 = PINA & 0x01;
-        tmpA1 = PINA & 0x02;
-        // 2) Perform computation
+        tmpA = PINA;
+        tmpB = PINB;
+        tmpC = PINC;
 
-        if (tmpA0 == 0x01 && tmpA1 == 0x00) { // True if PA0 is 1 and PA1 is 0
-            tmpB = (tmpB & 0xFE) | 0x01; // Sets tmpB to bbbbbbb1
-                             // (clear rightmost 1 bits, then set to 1)
-        } else {
-            tmpB = (tmpB & 0xFE) | 0x00; // Sets tmpB to bbbbbbb0
-                             // (clear rightmost 1 bits, then set to 0)
-        }    
+        // 2) Perform computation
+        
+        total_weight = tmpA + tmpB + tmpC;
+
+        if (total_weight > 0x8C) {
+            over_cap = 0x01;
+        }
+        
+        if (tmpA > tmpC) {
+            if (tmpA - tmpC > 0x50)
+                balanced = 0x01;
+        }
+        else {
+            if (tmpC - tmpA > 0x50)
+                balanced = 0x01;
+        }
+        
+        if (balanced == 0x01 && over_cap == 0x01)
+            ret = (total_weight & 0xFC) | 0x03;
+        if (balanced == 0x01 && over_cap == 0x00)
+            ret = (total_weight & 0xFC) | 0x02;
+        if (balanced == 0x00 && over_cap == 0x01)
+            ret = (total_weight & 0xFC) | 0x01;
+        else 
+           ret = total_weight;
+
         // 3) Write output
-        PORTB = tmpB;    
+
+        PORTD = ret;
     }
     return 0;
 }

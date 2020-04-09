@@ -23,6 +23,9 @@ int main(void) {
     unsigned char tmpA = 0x00;
     unsigned char tmpB = 0x00;
     unsigned char tmpC = 0x00;
+    
+    unsigned char over_cap = 0x01;
+    unsigned char balanced = 0x01;
 
     unsigned char ret = 0x00;
 
@@ -37,24 +40,30 @@ int main(void) {
         total_weight = tmpA + tmpB + tmpC;
 
         if (total_weight > 0x8C) {
-            ret = ret |  0x01;
+            over_cap = 0x01;
         }
         
         if (tmpA > tmpC) {
             if (tmpA - tmpC > 0x50)
-                ret = ret | 0x02;
+                balanced = 0x01;
         }
         else {
             if (tmpC - tmpA > 0x50)
-                ret = ret | 0x02;
+                balanced = 0x01;
         }
+        
+        if (balanced == 0x01 && over_cap == 0x01)
+            ret = (total_weight & 0xFC) | 0x03;
+        if (balanced == 0x01 && over_cap == 0x00)
+            ret = (total_weight & 0xFC) | 0x02;
+        if (balanced == 0x00 && over_cap == 0x01)
+            ret = (total_weight & 0xFC) | 0x01;
+        else 
+           ret = total_weight;
 
-        ret = (total_weight & 0xFC) | ret;
-        
         // 3) Write output
-        
+
         PORTD = ret;
     }
     return 0;
-
 }
