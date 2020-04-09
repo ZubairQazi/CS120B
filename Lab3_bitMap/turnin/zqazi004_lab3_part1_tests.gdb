@@ -40,40 +40,25 @@ checkResult
 
 # Add tests below
 
-test "PINA: 0x02 => PORTC: 0x60"
+test "PINA: 0x01, PINB: 0x01 => PORTC: 0x02"
+setPINA 0x01
+setPINB 0x01
+continue 5
+expectPORTC 0x02
+checkResult
+
+test "PINA: 0x00, PINB: 0x00 => PORTC: 0x00"
+setPINA 0x00
+setPINB 0x00
+continue 5
+expectPORTC 0x00
+checkResult
+
+test "PINA: 0x02, PINB: 0x02 => PORTC: 0x02"
 setPINA 0x02
+setPINB 0x02
 continue 5
-expectPORTC 0x60
-checkResult
-
-test "PINA: 0x04 => PORTC: 0x70"
-setPINA 0x04
-continue 5
-expectPORTC 0x70
-checkResult
-
-test "PINA: 0x06 => PORTC: 0x38"
-setPINA 0x06
-continue 5
-expectPORTC 0x38
-checkResult
-
-test "PINA: 0x08 => PORTC: 0x3C"
-setPINA 0x08
-continue 5
-expectPORTC 0x3C
-checkResult
-
-test "PINA: 0x0B => PORTC: 0x3E"
-setPINA 0x0B
-continue 5
-expectPORTC 0x3E
-checkResult
-
-test "PINA: 0x0F => PORTC: 0x3F"
-setPINA 0x0F
-continue 5
-expectPORTC 0x3F
+expectPORTC 0x02
 checkResult
 
 # Report on how many tests passed/tests ran

@@ -15,31 +15,25 @@
 int main(void) {
     /* Insert DDR and PORT initializations */
     DDRA = 0x00; PORTA = 0xFF;
+    DDRB = 0x00; PORTB = 0xFF;
     DDRC = 0xFF; PORTC = 0x00;
 
     unsigned char tempA = 0x00;
+    unsigned char tempB = 0x00;
     unsigned char tempC = 0x00;
 
     /* Insert your solution below */
     while (1) {
         tempA = PINA;
+        tempB = PINB;
         tempC = 0x00;
 
-        if (tempA <= 2 && tempA >= 1) 
-            tempC = tempC | 0x20;
-        else if (tempA <= 4 && tempA >= 3)
-            tempC = tempC | 0x30;
-        else if (tempA <= 6 && tempA >= 5)
-            tempC = tempC | 0x38;
-        else if (tempA <= 9 && tempA >= 7)
-            tempC = tempC | 0x3C;
-        else if (tempA <= 12 && tempA >= 10)
-            tempC = tempC | 0x3E;
-        else if (tempA <= 15 && tempA >= 13)
-            tempC = tempC | 0x3F;
-
-        if (tempA <= 4)
-            tempC = tempC | 0x40;
+        for (unsigned char i = 0; i < 8; i++) {
+            if ((tempA >> i) & 0x01)
+                tempC++;
+            if ((tempB >> i) & 0x01)
+                tempC++;
+        }
 
         PORTC = tempC;
     }
