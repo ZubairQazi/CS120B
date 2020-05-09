@@ -1,0 +1,22 @@
+Breakpoint 1 at 0x380: file source/main.c, line 167.
+Note: automatically using hardware breakpoints for read-only addresses.
+======================================================
+Running all tests..."
+
+"expect PORTB: 0x02"...
+	Expected 0x02 
+	PORTB '0x800025:	0x01
+"expect PORTB: 0x01, 0x02"...PORTB addr0x800025:	0x01
+PORTB addr0x800025:	0x01
+
+	Expected 0x02 
+	PORTB '0x800025:	0x01
+"expect PORTB: 0x01, 0x02, 0x04, 0x02"...PORTB addr0x800025:	0x01
+PORTB addr0x800025:	0x01
+PORTB addr0x800025:	0x01
+PORTB addr0x800025:	0x01
+
+	Expected 0x02 
+	PORTB '0x800025:	0x01
+======================================================
+Remote doesn't know how to detach
