@@ -109,10 +109,9 @@ void Tick() {
 
         case Release:
             if (A0) {
-                tempB = PORTB;
                 state = One;
             }
-            else {
+            else if (!A0) {
                 tempB = PORTB;
                 state = Release;
             }
