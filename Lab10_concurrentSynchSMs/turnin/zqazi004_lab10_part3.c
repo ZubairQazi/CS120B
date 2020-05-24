@@ -15,10 +15,13 @@
 
 unsigned char threeLEDs = 0;
 unsigned char blinkingLED = 0;
+unsigned char speaker = 0;
 
 enum TL_States {TL_Start, TL_LED0, TL_LED1, TL_LED2} TL_State;
 
 enum BL_States {BL_Start, BL_1, BL_0} BL_State;
+
+enum TS_States {TS_Start, TS_Wait, TS_1, TS_0} TS_State;
 
 volatile unsigned char TimerFlag = 0;
 
@@ -127,26 +130,63 @@ void Tick_BlinkingLEDSM() {
 
 }
 
+void Tick_ToggleSpeaker() {
+
+    unsigned char A2 = ~PINA & 0x04;
+
+    switch (TS_State) {
+        case TS_Start:
+            TS_State = TS_Wait;
+            break;
+        
+        case TS_Wait:
+            TS_State = A2 ? TS_1 : TS_Wait;
+            break;
+
+        case TS_1:
+            TS_State = A2 ? TS_0 : TS_Wait;
+            break;
+
+        case TS_0:
+            TS_State = A2 ? TS_1 : TS_Wait;
+            break;
+    }
+
+    switch (TS_State) {
+        case TS_1:
+            speaker = 0x10;
+            break;
+
+        default:
+            speaker = 0;
+            break;
+    }
+
+}
+
 void Tick_CombineLEDsSM() {
 
-    PORTB = threeLEDs | blinkingLED;
+    PORTB =  speaker | threeLEDs | blinkingLED;
 
 }
 
 int main(void) {
     /* Insert DDR and PORT initializations */
-    DDRB = 0xFF; PORTB = 0x00;
+    DDRA = 0x00; PORTA = 0xFF;
+    DDRB = 0xFF; PORTB = 0x10;
 
     unsigned long TL_elapsedTime = 300;
     unsigned long BL_elapsedTime = 1000;
+    unsigned long TS_elapsedTime = 2;
 
-    const unsigned long timerPeriod = 100;
+    const unsigned long timerPeriod = 1;
 
     TimerSet(timerPeriod);
     TimerOn();
     
     TL_State = TL_Start;
     BL_State = BL_Start;
+    TS_State = TS_Start;
 
     /* Insert your solution below */
     while (1) {
@@ -154,15 +194,20 @@ int main(void) {
             Tick_ThreeLEDsSM();
             TL_elapsedTime = 0;
         }
-        if (BL_elapsedTime >= 1500) {
+        if (BL_elapsedTime >= 1000) {
             Tick_BlinkingLEDSM();
             BL_elapsedTime = 0;
+        }
+        if (TS_elapsedTime >= 2) {
+            Tick_ToggleSpeaker();
+            TS_elapsedTime = 0;
         }
         Tick_CombineLEDsSM();
         while (!TimerFlag);
         TimerFlag = 0;
         TL_elapsedTime += timerPeriod;
         BL_elapsedTime += timerPeriod;
+        TS_elapsedTime += timerPeriod;
     }
     return 1;
 }
